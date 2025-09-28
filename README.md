@@ -239,6 +239,14 @@ Add to `mcp.json`:
 }
 ```
 
+### Installing via Smithery
+
+To install naver-search-mcp-impl automatically via [Smithery](https://smithery.ai/server/@isnow890/naver-search-mcp-impl):
+
+```bash
+npx -y @smithery/cli install @isnow890/naver-search-mcp-impl --client claude
+```
+
 ### Method 2: Local Installation
 
 For local development or custom modifications:
@@ -338,8 +346,8 @@ pwd
 
 # Absolute path examples
 # Windows: C:\Users\username\Downloads\naver-search-mcp
-# macOS: /Users/username/Downloads/naver-search-mcp
-# Linux: /home/username/Downloads/naver-search-mcp
+# macOS: /Users/username/Downloads\naver-search-mcp
+# Linux: /home/username/Downloads\naver-search-mcp
 ```
 
 #### Step 3: Restart Claude Desktop
@@ -356,7 +364,7 @@ After completing the configuration, completely close and restart Claude Desktop 
 
 #### For Claude Desktop:
 ```bash
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client claude
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp
 ```
 
 #### For other AI clients:
