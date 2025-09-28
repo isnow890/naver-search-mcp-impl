@@ -58,6 +58,21 @@ export function createNaverSearchServer({
   });
 
   server.registerTool(
+    "search_webkr",
+    {
+      description:
+        "🌐 Search Korean web documents and general content. Comprehensive search across Korean websites and online content. Find articles, information, and documents from various Korean sources. For recent content or 'today's results', use get_current_korean_time first. (네이버 웹문서 검색 - 한국 웹사이트 종합 검색, 최근 콘텐츠나 오늘 결과를 찾을 때는 먼저 get_current_korean_time으로 현재 시간을 확인하세요)",
+      inputSchema: SearchArgsSchema.shape,
+    },
+    async (args) => {
+      const result = await searchToolHandlers.search_webkr(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+      };
+    }
+  );
+
+  server.registerTool(
     "search_news",
     {
       description:
