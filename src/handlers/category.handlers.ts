@@ -1,114 +1,47 @@
+// Import JSON data - bundle-safe approach
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
 
-// Bundle-safe directory resolution
-let __dirname: string;
-try {
-  if (typeof import.meta.url !== 'undefined') {
-    const __filename = fileURLToPath(import.meta.url);
-    __dirname = path.dirname(__filename);
-  } else {
-    // Fallback for bundled environments
-    __dirname = path.join(process.cwd(), 'dist', 'src', 'handlers');
+// Load categories data with fallback paths for different environments
+function getCategoriesData(): any[] {
+  try {
+    // Try bundled data path first (dist/data)
+    const bundledPath = path.join(process.cwd(), 'dist', 'data', 'categories.json');
+    if (fs.existsSync(bundledPath)) {
+      return JSON.parse(fs.readFileSync(bundledPath, 'utf8'));
+    }
+
+    // Fallback to source data path
+    const sourcePath = path.join(process.cwd(), 'data', 'categories.json');
+    if (fs.existsSync(sourcePath)) {
+      return JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+    }
+
+    throw new Error('카테고리 데이터 파일을 찾을 수 없습니다');
+  } catch (error) {
+    console.error('카테고리 데이터 로딩 실패:', error);
+    return [];
   }
-} catch {
-  // Final fallback
-  __dirname = path.join(process.cwd(), 'dist', 'src', 'handlers');
 }
+
+const categoriesData = getCategoriesData();
 
 // Category data structure
 interface CategoryData {
   code: string;
   level1: string; // 대분류
-  level2: string; // 중분류  
+  level2: string; // 중분류
   level3: string; // 소분류
   level4: string; // 세분류
 }
 
-// Cache management
-let categoryCache: CategoryData[] | null = null;
-let cacheTimestamp: number = 0;
-
 /**
- * Load and cache category data from Excel file
+ * Load category data from bundled JSON file
  */
 async function loadCategoryData(): Promise<CategoryData[]> {
-  // Use __dirname to get the directory of the current module, then go to data folder
-  const dataPath = path.resolve(__dirname, '..', '..', 'data');
-  
-  // Find any Excel file in data directory
-  const files = fs.readdirSync(dataPath);
-  const excelFiles = files.filter(file => 
-    file.endsWith('.xlsx') || file.endsWith('.xls')
-  );
-  
-  if (excelFiles.length === 0) {
-    throw new Error(`카테고리 Excel 파일을 찾을 수 없습니다. data 폴더에 .xlsx 또는 .xls 파일을 넣어주세요: ${dataPath}`);
-  }
-  
-  // Use the first Excel file found
-  const filePath = path.join(dataPath, excelFiles[0]);
-  console.error(`Using Excel file: ${excelFiles[0]}`);
-  
-  // Check if file exists (redundant but safe)
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`카테고리 파일을 찾을 수 없습니다: ${filePath}`);
-  }
-  
-  const fileStats = fs.statSync(filePath);
-  
-  // Return cached data if file hasn't changed
-  if (categoryCache && fileStats.mtime.getTime() <= cacheTimestamp) {
-    return categoryCache;
-  }
-  
-  console.error('Loading category data from Excel file...');
-  
-  // Read Excel file - improved ES modules compatibility
-  let XLSX: any;
-  try {
-    // Try dynamic import first (modern ES modules)
-    try {
-      XLSX = await import('xlsx');
-      // Handle default export structure
-      if (XLSX.default) {
-        XLSX = XLSX.default;
-      }
-    } catch (importError) {
-      // Fallback to createRequire for bundled environments
-      const require = createRequire(import.meta.url);
-      XLSX = require('xlsx');
-    }
-  } catch (error) {
-    throw new Error(`xlsx 패키지 로드 실패. 패키지가 설치되지 않았거나 호환성 문제입니다. 세부사항: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  
-  // Convert to JSON (skip header row)
-  const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  const dataRows = rawData.slice(1) as string[][]; // Skip header row
-  
-  // Parse data
-  categoryCache = dataRows
-    .filter(row => row.length >= 2 && row[0]) // Filter out empty rows
-    .map(row => ({
-      code: String(row[0] || '').trim(),
-      level1: String(row[1] || '').trim(),
-      level2: String(row[2] || '').trim(),
-      level3: String(row[3] || '').trim(),
-      level4: String(row[4] || '').trim(),
-    }))
-    .filter(item => item.code); // Only include rows with valid codes
-  
-  cacheTimestamp = fileStats.mtime.getTime();
-  
-  console.error(`Loaded ${categoryCache.length} categories from Excel file`);
-  return categoryCache;
+  // Return the pre-loaded JSON data - no file system access needed
+  console.error(`Loaded ${categoriesData.length} categories from bundled JSON data`);
+  return categoriesData as CategoryData[];
 }
 
 /**
