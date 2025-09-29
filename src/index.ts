@@ -31,27 +31,19 @@ export const configSchema = z.object({
   NAVER_CLIENT_SECRET: z.string().describe("Naver API Client Secret"),
 });
 
-// Global server instance to prevent memory leaks
-let globalServerInstance: McpServer | null = null;
-
-export function createNaverSearchServer({
+export default function createNaverSearchServer({
   config,
 }: {
   config: z.infer<typeof configSchema>;
 }) {
-  // Reuse existing server instance to prevent memory leaks
-  if (globalServerInstance) {
-    return globalServerInstance;
-  }
-
-  // Create a new MCP server only once
+  // Create a new MCP server for each request to avoid state sharing
   const server = new McpServer({
     name: "naver-search",
-    version: "1.0.44",
+    version: "1.0.45",
   });
 
-  // Initialize Naver client with config
-  const client = NaverSearchClient.getInstance();
+  // Cache the server instance - for Smithery HTTP mode, create new client instance for each request
+  const client = new NaverSearchClient();
   client.initialize({
     clientId: config.NAVER_CLIENT_ID,
     clientSecret: config.NAVER_CLIENT_SECRET,
@@ -412,39 +404,23 @@ export function createNaverSearchServer({
     }
   );
 
-  // Cache the server instance
-  globalServerInstance = server;
-
   return server.server;
 }
 
-// Export default for Smithery compatibility
-export default createNaverSearchServer;
-
-// Main function to run the server when executed directly
+// STDIO compatibility main function (optional)
 async function main() {
   try {
-    console.error("Starting Naver Search MCP Server...");
+    console.error("🚀 Starting Naver Search MCP Server in STDIO mode...");
 
-    // Get config from environment variables - check for empty strings too
-    const clientId = process.env.NAVER_CLIENT_ID?.trim();
-    const clientSecret = process.env.NAVER_CLIENT_SECRET?.trim();
-
-    console.error("Environment variables:", {
-      NAVER_CLIENT_ID: process.env.NAVER_CLIENT_ID
-        ? `[${process.env.NAVER_CLIENT_ID.length} chars]`
-        : "undefined",
-      NAVER_CLIENT_SECRET: process.env.NAVER_CLIENT_SECRET
-        ? `[${process.env.NAVER_CLIENT_SECRET.length} chars]`
-        : "undefined",
-    });
+    // Get config from environment variables
+    const clientId = process.env?.NAVER_CLIENT_ID?.trim();
+    const clientSecret = process.env?.NAVER_CLIENT_SECRET?.trim();
 
     if (!clientId || !clientSecret) {
-      throw new Error(`Missing required environment variables:
-        NAVER_CLIENT_ID: ${clientId ? "provided" : "missing"}
-        NAVER_CLIENT_SECRET: ${clientSecret ? "provided" : "missing"}
-        
-        Please set these environment variables before running the server.`);
+      console.error("❌ Missing required environment variables:");
+      console.error("  - NAVER_CLIENT_ID");
+      console.error("  - NAVER_CLIENT_SECRET");
+      process.exit(1);
     }
 
     const config = {
@@ -452,70 +428,33 @@ async function main() {
       NAVER_CLIENT_SECRET: clientSecret,
     };
 
-    console.error("Config loaded successfully");
-
     // Validate config
     const validatedConfig = configSchema.parse(config);
+
+    console.error("Environment variables:", {
+      NAVER_CLIENT_ID: `[${clientId.length} chars]`,
+      NAVER_CLIENT_SECRET: `[${clientSecret.length} chars]`,
+    });
+
     console.error("Config validated successfully");
 
     // Create server instance
-    const serverFactory = createNaverSearchServer({ config: validatedConfig });
-    console.error("Server factory created");
+    const server = createNaverSearchServer({ config: validatedConfig });
 
     // Create transport and run server
     const transport = new StdioServerTransport();
     console.error("Transport created, connecting...");
 
-    await serverFactory.connect(transport);
+    await server.connect(transport);
     console.error("Server connected and running");
   } catch (error) {
-    console.error("Error in main function:", error);
+    console.error("Error in STDIO main function:", error);
     throw error;
   }
 }
 
-// Run main function if this file is executed directly
-// Note: Always run main in CLI mode since this is an MCP server
-console.error("Starting MCP server initialization...");
-console.error("process.argv:", process.argv);
-
-// Check if running as main module - compatible with both ESM and CommonJS
-let isMainModule = false;
-try {
-  // Try ESM approach first
-  if (typeof import.meta !== "undefined" && import.meta.url) {
-    console.error("import.meta.url:", import.meta.url);
-    isMainModule =
-      import.meta.url === `file://${process.argv[1]}` ||
-      import.meta.url.endsWith(process.argv[1]) ||
-      process.argv[1].endsWith("index.js");
-  } else {
-    // Fallback for CommonJS or when import.meta is not available
-    isMainModule =
-      process.argv[1].endsWith("index.js") ||
-      process.argv[1].includes("naver-search-mcp");
-  }
-  
-  // Additional check for NPX execution
-  if (!isMainModule && process.argv.some(arg => arg.includes('naver-search-mcp'))) {
-    isMainModule = true;
-    console.error("Detected NPX execution, forcing main module mode");
-  }
-} catch (error) {
-  // Fallback for environments where import.meta causes issues
-  isMainModule =
-    process.argv[1].endsWith("index.js") ||
-    process.argv[1].includes("naver-search-mcp");
-}
-
-console.error("isMainModule:", isMainModule);
-
-if (isMainModule) {
-  console.error("Running as main module, starting server...");
-  main().catch((error) => {
-    console.error("Server failed to start:", error);
-    process.exit(1);
-  });
-} else {
-  console.error("Not running as main module, skipping server start");
-}
+// Run main function
+main().catch((error) => {
+  console.error("Server failed to start:", error);
+  process.exit(1);
+});

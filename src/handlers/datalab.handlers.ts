@@ -1,3 +1,9 @@
+// Declare Node.js globals for this file
+declare const require: any;
+declare const process: any;
+declare const fs: any;
+declare const path: any;
+
 import { NaverSearchClient } from "../clients/naver-search.client.js";
 import {
   DatalabSearch,
@@ -10,9 +16,29 @@ import {
   DatalabShoppingKeywordGender,
   DatalabShoppingKeywordAge,
 } from "../schemas/datalab.schemas.js";
+import {
+  DatalabSearchRequest,
+  DatalabShoppingCategoryRequest,
+  DatalabShoppingKeywordsRequest,
+} from "../types/datalab.types.js";
 
-// 클라이언트 인스턴스 (싱글톤)
-const client = NaverSearchClient.getInstance();
+// 클라이언트 인스턴스 팩토리
+function getClient(): NaverSearchClient {
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  
+  if (!clientId || !clientSecret) {
+    throw new Error('NAVER_CLIENT_ID and NAVER_CLIENT_SECRET must be set');
+  }
+
+  const client = new NaverSearchClient();
+  client.initialize({
+    clientId,
+    clientSecret,
+  });
+  
+  return client;
+}
 
 /**
  * 데이터랩 도구 핸들러 맵
@@ -65,16 +91,18 @@ export const datalabToolHandlers: Record<string, (args: any) => Promise<any>> =
  * @param params DatalabSearch
  */
 export async function handleSearchTrend(params: DatalabSearch) {
-  return client.searchTrend(params);
+  const client = getClient();
+  return client.searchTrend(params as DatalabSearchRequest);
 }
 
 /**
- * 쇼핑 카테고리 트렌드 핸들러
- * 네이버 데이터랩 쇼핑 카테고리별 트렌드 분석 API 호출
+ * 쇼핑 카테고리별 트렌드 핸들러
+ * 네이버 데이터랩 쇼핑 카테고리 트렌드 분석 API 호출
  * @param params DatalabShopping
  */
 export async function handleShoppingCategoryTrend(params: DatalabShopping) {
-  return client.datalabShoppingCategory(params);
+  const client = getClient();
+  return client.datalabShoppingCategory(params as DatalabShoppingCategoryRequest);
 }
 
 /**
@@ -85,6 +113,7 @@ export async function handleShoppingCategoryTrend(params: DatalabShopping) {
 export async function handleShoppingByDeviceTrend(
   params: DatalabShoppingDevice
 ) {
+  const client = getClient();
   return client.datalabShoppingByDevice({
     startDate: params.startDate,
     endDate: params.endDate,
@@ -102,6 +131,7 @@ export async function handleShoppingByDeviceTrend(
 export async function handleShoppingByGenderTrend(
   params: DatalabShoppingGender
 ) {
+  const client = getClient();
   return client.datalabShoppingByGender({
     startDate: params.startDate,
     endDate: params.endDate,
@@ -112,11 +142,12 @@ export async function handleShoppingByGenderTrend(
 }
 
 /**
- * 쇼핑 연령별 트렌드 핸들러
- * 네이버 데이터랩 쇼핑 연령별 트렌드 분석 API 호출
+ * 쇼핑 연령대별 트렌드 핸들러
+ * 네이버 데이터랩 쇼핑 연령대별 트렌드 분석 API 호출
  * @param params DatalabShoppingAge
  */
 export async function handleShoppingByAgeTrend(params: DatalabShoppingAge) {
+  const client = getClient();
   return client.datalabShoppingByAge({
     startDate: params.startDate,
     endDate: params.endDate,
@@ -127,20 +158,21 @@ export async function handleShoppingByAgeTrend(params: DatalabShoppingAge) {
 }
 
 /**
- * 쇼핑 키워드 트렌드 핸들러 (복수 키워드 그룹 지원)
- * 네이버 데이터랩 쇼핑 키워드 그룹 트렌드 분석 API 호출
+ * 쇼핑 키워드 트렌드 핸들러
+ * 네이버 데이터랩 쇼핑 키워드 트렌드 분석 API 호출
  * @param params DatalabShoppingKeywords
  */
 export async function handleShoppingKeywordsTrend(
   params: DatalabShoppingKeywords
 ) {
   // 키워드 배열을 네이버 API에 맞는 형식으로 변환
+  const client = getClient();
   return client.datalabShoppingKeywords({
     startDate: params.startDate,
     endDate: params.endDate,
     timeUnit: params.timeUnit,
     category: params.category,
-    keyword: params.keyword,
+    keyword: params.keyword as DatalabShoppingKeywordsRequest['keyword'],
   });
 }
 
@@ -152,6 +184,7 @@ export async function handleShoppingKeywordsTrend(
 export async function handleShoppingKeywordByDeviceTrend(
   params: DatalabShoppingKeywordDevice
 ) {
+  const client = getClient();
   return client.datalabShoppingKeywordByDevice({
     startDate: params.startDate,
     endDate: params.endDate,
@@ -170,6 +203,7 @@ export async function handleShoppingKeywordByDeviceTrend(
 export async function handleShoppingKeywordByGenderTrend(
   params: DatalabShoppingKeywordGender
 ) {
+  const client = getClient();
   return client.datalabShoppingKeywordByGender({
     startDate: params.startDate,
     endDate: params.endDate,
@@ -188,6 +222,7 @@ export async function handleShoppingKeywordByGenderTrend(
 export async function handleShoppingKeywordByAgeTrend(
   params: DatalabShoppingKeywordAge
 ) {
+  const client = getClient();
   return client.datalabShoppingKeywordByAge({
     startDate: params.startDate,
     endDate: params.endDate,

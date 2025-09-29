@@ -1,6 +1,10 @@
 // Import JSON data - bundle-safe approach
-import * as fs from 'fs';
-import * as path from 'path';
+// Declare Node.js globals for this file
+declare const require: any;
+declare const process: any;
+
+const fs = require('fs');
+const path = require('path');
 
 // Load categories data with fallback paths for different environments
 function getCategoriesData(): any[] {

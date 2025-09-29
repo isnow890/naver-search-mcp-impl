@@ -1,35 +1,42 @@
 {
   "name": "@isnow890/naver-search-mcp",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "Naver Search MCP Server",
   "main": "dist/src/index.js",
-  "module": "./src/index.ts",
+  "module": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
+    "dev": "smithery dev",
     "prebuild": "npx shx rm -rf dist",
-    "build": "tsc && shx cp -r data dist/",
-    "prepare": "npm run build",
+    "build": "npm run build:http",
+    "build:stdio": "tsc && shx cp -r data dist/",
+    "build:http": "smithery build",
+    "prepare": "npm run build:stdio",
     "watch": "tsc --watch",
-    "start": "node dist/src/index.js"
+    "start": "npm run start:http",
+    "start:http": "node .smithery/index.cjs",
+    "start:stdio": "node dist/src/index.js",
+    "prepublishOnly": "npm run build:stdio"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.17.1",
-    "@smithery/sdk": "^1.6.6",
+    "@modelcontextprotocol/sdk": "^1.18.2",
+    "@smithery/sdk": "^1.6.4",
     "axios": "^1.6.7",
-    "zod": "^3.23.0",
-    "zod-to-json-schema": "^3.23.0",
-    "sharp": "^0.33.2",
     "dotenv": "^16.4.5",
-    "xlsx": "0.18.5"
+    "sharp": "^0.33.2",
+    "xlsx": "0.18.5",
+    "zod": "^3.25.46",
+    "zod-to-json-schema": "^3.23.0"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@smithery/cli": "^1.4.0",
+    "@types/node": "^22.18.6",
     "shx": "^0.3.4",
     "typescript": "^5.3.3"
   },

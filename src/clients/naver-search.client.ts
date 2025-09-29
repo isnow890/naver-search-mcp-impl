@@ -22,24 +22,12 @@ import {
 } from "../types/datalab.types.js";
 
 /**
- * NaverSearchClient - 네이버 API 서비스를 위한 싱글톤 클라이언트
+ * NaverSearchClient - 네이버 API 서비스를 위한 클라이언트
  * 검색, 데이터랩 API 요청 처리
  */
 export class NaverSearchClient extends NaverApiCoreClient {
-  private static instance: NaverSearchClient | null = null;
-
-  private constructor() {
+  constructor() {
     super();
-  }
-
-  /**
-   * 싱글톤 인스턴스 반환
-   */
-  static getInstance(): NaverSearchClient {
-    if (!NaverSearchClient.instance) {
-      NaverSearchClient.instance = new NaverSearchClient();
-    }
-    return NaverSearchClient.instance;
   }
 
   /**

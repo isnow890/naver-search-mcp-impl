@@ -6,9 +6,14 @@
 
 Naver 검색 API와 DataLab API 통합을 위한 MCP 서버로, 다양한 Naver 서비스에서의 종합적인 검색과 데이터 트렌드 분석을 가능하게 합니다.
 
-> ⚠️ **Smithery 설치 안내**: Smithery 플랫폼의 호환성 오류로 인해 **1.0.40 버전부터는 npx를 통한 설치를 권장**합니다. Smithery를 통한 설치는 1.0.30 버전까지만 지원됩니다.
-
 #### 버전 히스토리
+
+###### 1.0.45 (2025-09-28)
+
+- Smithery 호환성 문제 해결 - 이제 Smithery를 통해 최신 기능으로 사용 가능
+- 카테고리 검색에서 엑셀 호환성 문제 해결 - JSON 기능으로 교체
+- 웹 한국어 검색(`search_webkr`) 기능 복구
+- Smithery 플랫폼 설치와 완전 호환
 
 ###### 1.0.44 (2025-08-31)
 
@@ -194,9 +199,30 @@ datalab_shopping_keywords → "홈트" vs "헬스장" 트렌드 분석
 
 ## 설치
 
-### 방법 1: NPX 설치 (권장)
+### 방법 1: Smithery 설치 (권장)
 
-이 MCP 서버를 사용하는 가장 쉬운 방법은 NPX를 통한 설치입니다. 자세한 패키지 정보는 [NPM 패키지 페이지](https://www.npmjs.com/package/@isnow890/naver-search-mcp)를 참조하세요.
+이 MCP 서버를 사용하는 가장 쉬운 방법은 Smithery를 통한 설치입니다.
+
+#### Claude Desktop용:
+```bash
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client claude
+```
+
+#### 기타 AI 클라이언트용:
+```bash
+# Cursor
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cursor
+
+# Windsurf
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client windsurf
+
+# Cline
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cline
+```
+
+### 방법 2: NPX 설치
+
+대안으로 NPX 설치를 사용할 수 있습니다. 자세한 패키지 정보는 [NPM 패키지 페이지](https://www.npmjs.com/package/@isnow890/naver-search-mcp)를 참조하세요.
 
 #### Claude Desktop 설정
 
@@ -236,7 +262,7 @@ Claude Desktop 설정 파일에 다음을 추가하세요 (Windows: `%APPDATA%\C
 }
 ```
 
-### 방법 2: 로컬 설치
+### 방법 3: 로컬 설치
 
 로컬 개발이나 커스텀 수정이 필요한 경우:
 
@@ -346,27 +372,6 @@ pwd
 ---
 
 ## 대안 설치 방법
-
-### 방법 3: Smithery 레거시 설치 (v1.0.30 이하만 지원)
-
-⚠️ **주의**: 플랫폼 호환성 문제로 인해 1.0.30 버전 이하에서만 작동합니다.
-
-#### Claude Desktop용:
-```bash
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client claude
-```
-
-#### 기타 AI 클라이언트용:
-```bash
-# Cursor
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cursor
-
-# Windsurf
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client windsurf
-
-# Cline
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cline
-```
 
 ### 방법 4: Docker 설치
 

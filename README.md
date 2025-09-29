@@ -6,11 +6,14 @@
 [![smithery badge](https://smithery.ai/badge/@isnow890/naver-search-mcp)](https://smithery.ai/server/@isnow890/naver-search-mcp)
 [![MCP.so](https://img.shields.io/badge/MCP.so-Naver%20Search%20MCP-blue)](https://mcp.so/server/naver-search-mcp/isnow890)
 
-MCP server for Naver Search API and DataLab API integration, enabling comprehensive search across various Naver services and data trend analysis.
-
-> ⚠️ **Smithery Installation Notice**: Due to compatibility issues with the Smithery platform, **npx installation is recommended starting from version 1.0.40**. Smithery installation is only supported up to version 1.0.30.
-
 #### Version History
+
+###### 1.0.45 (2025-09-28)
+
+- Smithery compatibility issues resolved - Now available through Smithery with latest features
+- Excel compatibility issues fixed in category search - Replaced with JSON functionality
+- Web Korean search (`search_webkr`) functionality restored
+- Full compatibility with Smithery platform installations
 
 ###### 1.0.44 (2025-08-31)
 
@@ -197,9 +200,32 @@ datalab_shopping_keywords → "home workout" vs "gym" trend analysis
 
 ## Installation
 
-### Method 1: NPX Installation (Recommended)
+### Method 1: Smithery Installation (Recommended)
 
-The easiest way to use this MCP server is through NPX. For detailed package information, see the [NPM package page](https://www.npmjs.com/package/@isnow890/naver-search-mcp).
+The easiest way to use this MCP server is through Smithery.
+
+#### For Claude Desktop:
+
+```bash
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client claude
+```
+
+#### For other AI clients:
+
+```bash
+# Cursor
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cursor
+
+# Windsurf
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client windsurf
+
+# Cline
+npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cline
+```
+
+### Method 2: NPX Installation
+
+Alternatively, you can use NPX installation. For detailed package information, see the [NPM package page](https://www.npmjs.com/package/@isnow890/naver-search-mcp).
 
 #### Claude Desktop Configuration
 
@@ -239,7 +265,7 @@ Add to `mcp.json`:
 }
 ```
 
-### Method 2: Local Installation
+### Method 3: Local Installation
 
 For local development or custom modifications:
 
@@ -349,27 +375,6 @@ After completing the configuration, completely close and restart Claude Desktop 
 ---
 
 ## Alternative Installation Methods
-
-### Method 3: Legacy Smithery Installation (Only for v1.0.30 and below)
-
-⚠️ **Note**: This method only works for versions 1.0.30 and below due to platform compatibility issues.
-
-#### For Claude Desktop:
-```bash
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client claude
-```
-
-#### For other AI clients:
-```bash
-# Cursor
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cursor
-
-# Windsurf
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client windsurf
-
-# Cline
-npx -y @smithery/cli@latest install @isnow890/naver-search-mcp --client cline
-```
 
 ### Method 4: Docker Installation
 

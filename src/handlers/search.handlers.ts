@@ -1,11 +1,31 @@
+// Declare Node.js globals for this file
+declare const require: any;
+declare const process: any;
+
 import { NaverSearchClient } from "../clients/naver-search.client.js";
 import { NaverLocalSearchParams } from "../schemas/search.schemas.js";
 
 import { SearchArgs } from "../schemas/search.schemas.js";
 import { SearchArgsSchema } from "../schemas/search.schemas.js";
 
-// 클라이언트 인스턴스
-const client = NaverSearchClient.getInstance();
+// 클라이언트 인스턴스 팩토리
+function getClient(): NaverSearchClient {
+  // 환경변수에서 설정 읽기
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  
+  if (!clientId || !clientSecret) {
+    throw new Error('NAVER_CLIENT_ID and NAVER_CLIENT_SECRET must be set');
+  }
+
+  const client = new NaverSearchClient();
+  client.initialize({
+    clientId,
+    clientSecret,
+  });
+  
+  return client;
+}
 
 export const searchToolHandlers: Record<string, (args: any) => Promise<any>> = {
   search_webkr: (args) => {
@@ -58,6 +78,7 @@ export const searchToolHandlers: Record<string, (args: any) => Promise<any>> = {
  * 전문자료 검색 핸들러
  */
 export async function handleAcademicSearch(params: SearchArgs) {
+  const client = getClient();
   return client.searchAcademic(params);
 }
 
@@ -65,6 +86,7 @@ export async function handleAcademicSearch(params: SearchArgs) {
  * 도서 검색 핸들러
  */
 export async function handleBookSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("book", params);
 }
 
@@ -72,6 +94,7 @@ export async function handleBookSearch(params: SearchArgs) {
  * 지식백과 검색 핸들러
  */
 export async function handleEncycSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("encyc", params);
 }
 
@@ -79,6 +102,7 @@ export async function handleEncycSearch(params: SearchArgs) {
  * 이미지 검색 핸들러
  */
 export async function handleImageSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("image", params);
 }
 
@@ -86,6 +110,7 @@ export async function handleImageSearch(params: SearchArgs) {
  * 지식iN 검색 핸들러
  */
 export async function handleKinSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("kin", params);
 }
 
@@ -93,6 +118,7 @@ export async function handleKinSearch(params: SearchArgs) {
  * 지역 검색 핸들러
  */
 export async function handleLocalSearch(params: NaverLocalSearchParams) {
+  const client = getClient();
   return client.searchLocal(params);
 }
 
@@ -100,6 +126,7 @@ export async function handleLocalSearch(params: NaverLocalSearchParams) {
  * 뉴스 검색 핸들러
  */
 export async function handleNewsSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("news", params);
 }
 
@@ -107,6 +134,7 @@ export async function handleNewsSearch(params: SearchArgs) {
  * 블로그 검색 핸들러
  */
 export async function handleBlogSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("blog", params);
 }
 
@@ -114,6 +142,7 @@ export async function handleBlogSearch(params: SearchArgs) {
  * 쇼핑 검색 핸들러
  */
 export async function handleShopSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("shop", params);
 }
 
@@ -121,10 +150,11 @@ export async function handleShopSearch(params: SearchArgs) {
  * 카페글 검색 핸들러
  */
 export async function handleCafeArticleSearch(params: SearchArgs) {
+  const client = getClient();
   return client.search("cafearticle", params);
 }
 
 export async function handleWebKrSearch(args: SearchArgs) {
-  const client = NaverSearchClient.getInstance();
+  const client = getClient();
   return await client.search("webkr", args);
 }
